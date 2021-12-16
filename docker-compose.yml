@@ -1,0 +1,50 @@
+version: '3.8'
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: nodeapi
+    volumes:
+      - type: bind
+        source: ./src
+        target: /usr/src/app
+    ports:
+      - "5001:5000"
+    depends_on:
+      - database
+    networks:
+      - postgrenetwork
+
+  database:
+    image: postgres:11-alpine
+    container_name: postgres
+    env_file:
+      - ./postgre-env.list
+    volumes:
+      - postgresvolume:/pgdata
+    ports:
+      - '5432:5432'
+    networks:
+      - postgrenetwork
+
+  pgadmin4:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin4
+    env_file:
+      - ./pgadmin-env.list
+    volumes:
+      - pgadminvolume:/var/lib/pgadmin
+    ports:
+      - '8088:80'
+    depends_on:
+      - database
+    networks:
+      - postgrenetwork
+
+networks:
+  postgrenetwork:
+
+volumes:
+  postgresvolume:
+  pgadminvolume:
